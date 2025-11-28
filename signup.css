@@ -1,6 +1,17 @@
 
 /* ---------------- SIGNUP SECTION ---------------- */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
+body{
+    background-color: #d9c2a3;
+     width: 100vw;
+     height: 100vh;
+     overflow-x: hidden;
+}
 .signup-wrapper {
     height: 100vh;
     display: flex;
