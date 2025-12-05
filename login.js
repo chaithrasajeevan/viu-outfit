@@ -1,5 +1,5 @@
 document.getElementById("loginForm").addEventListener("submit", function(event) {
-    event.preventDefault(); // Stop form from submitting
+    event.preventDefault(); 
 
     let email = document.getElementById("email").value.trim();
     let password = document.getElementById("password").value.trim();
@@ -9,25 +9,21 @@ document.getElementById("loginForm").addEventListener("submit", function(event) 
 
     let valid = true;
 
-    // Reset errors
     emailError.textContent = "";
     passwordError.textContent = "";
 
-    // Email validation
     if (email === "") {
         emailError.textContent = "Email is required";
         valid = false;
     }
 
-    // Password validation
     if (password === "") {
         passwordError.textContent = "Password is required";
         valid = false;
     }
 
-    // If everything is valid
     if (valid) {
         alert("Login successful!");
-        // window.location.href = "homepage.html"; // Redirect after login
+        
     }
 });
