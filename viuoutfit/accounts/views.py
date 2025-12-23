@@ -53,3 +53,23 @@ def signup_view(request):
 def home_view(request):
     return render(request, 'index.html')
 
+def admin_login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None and user.is_staff:
+            login(request, user)
+            return redirect('/admin/')  
+        else:
+            return render(
+                request,
+                'adminlogin.html',
+                {'error': 'Invalid admin credentials'}
+            )
+
+    return render(request, 'adminlogin.html')
+
+
