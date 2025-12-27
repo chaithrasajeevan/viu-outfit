@@ -16,8 +16,6 @@ class Login(models.Model):
         return self.email
 
 
-from django.db import models
-
 class Outfit(models.Model):
     GENDER_CHOICES = [
         ('male', 'Male'),

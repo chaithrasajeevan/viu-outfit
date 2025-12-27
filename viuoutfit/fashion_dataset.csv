@@ -1,21 +1,114 @@
-gender,body_type,occasion,weather,style,top_color,bottom_color
-female,hourglass,party,summer,street,black,beige
-female,hourglass,party,summer,street,black,white
-female,hourglass,formal,winter,minimal,navy,black
-female,rectangle,casual,summer,minimal,white,blue
-female,rectangle,casual,winter,street,grey,black
-female,triangle,party,summer,traditional,red,gold
-female,triangle,casual,summer,street,black,blue
-female,inverted_triangle,casual,summer,street,white,black
-female,inverted_triangle,formal,winter,minimal,black,grey
-female,oval,casual,winter,minimal,navy,black
-male,ectomorph,casual,summer,street,white,blue
-male,ectomorph,party,summer,street,black,black
-male,ectomorph,formal,winter,minimal,grey,black
-male,mesomorph,party,summer,street,black,black
-male,mesomorph,casual,summer,street,blue,white
-male,mesomorph,formal,winter,minimal,navy,grey
-male,endomorph,casual,winter,minimal,darkgreen,black
-male,endomorph,party,winter,street,black,black
-male,endomorph,formal,winter,minimal,navy,black
-male,endomorph,casual,summer,street,white,black
+import csv
+import random
+
+def generate_realistic_fashion_data():
+    num_rows = 1500
+    filename = 'fashion_dataset_realistic.csv'
+
+    # --- CONSTANTS & PALETTES ---
+    
+    genders = ["male", "female"]
+    
+    body_types = {
+        "female": ["hourglass", "rectangle", "triangle", "inverted_triangle", "oval", "pear", "apple"],
+        "male": ["ectomorph", "mesomorph", "endomorph", "trapezoid", "oval"]
+    }
+
+    # 1. Styles allowed per Occasion (The "Dress Code")
+    occasion_style_map = {
+        "interview": ["formal", "business", "minimal"],
+        "sports":    ["sporty"],
+        "party":     ["chic", "street", "glam", "vintage", "traditional"],
+        "date":      ["casual", "chic", "romantic", "minimal", "vintage"],
+        "formal":    ["formal", "business", "traditional"],
+        "casual":    ["street", "casual", "minimal", "bohemian", "vintage"],
+        "travel":    ["casual", "sporty", "minimal", "bohemian"]
+    }
+
+    # 2. Color Palettes (The "Color Theory")
+    colors_neutral = ["black", "white", "navy", "grey", "beige", "charcoal", "cream"]
+    colors_dark    = ["black", "navy", "maroon", "darkgreen", "brown", "charcoal"]
+    colors_bright  = ["red", "yellow", "gold", "pink", "orange", "teal", "purple", "silver"]
+    colors_pastel  = ["lightblue", "beige", "white", "lavender", "peach", "mint"]
+    colors_denim   = ["blue", "lightblue", "black", "grey"] # Specifically for bottoms
+
+    # 3. Weather Bias
+    weathers = ["summer", "winter", "spring", "autumn", "rainy"]
+
+    with open(filename, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["gender", "body_type", "occasion", "weather", "style", "top_color", "bottom_color"])
+
+        for _ in range(num_rows):
+            # --- STEP 1: DEMOGRAPHICS ---
+            gender = random.choice(genders)
+            body_type = random.choice(body_types[gender])
+            
+            # --- STEP 2: CONTEXT ---
+            occasion = random.choice(list(occasion_style_map.keys()))
+            weather = random.choice(weathers)
+
+            # --- STEP 3: SELECT STYLE (Based on Occasion) ---
+            # If weather is rainy/winter, remove "bohemian" or "romantic" roughly, 
+            # but for simplicity, we stick to the occasion map.
+            style = random.choice(occasion_style_map[occasion])
+
+            # --- STEP 4: SELECT COLORS (The Smart Logic) ---
+            top_color = ""
+            bottom_color = ""
+
+            # LOGIC A: INTERVIEW / FORMAL (Strict Rules)
+            if occasion in ["interview", "formal"]:
+                # Men often wear suits (Monochrome) or Light Shirt/Dark Pant
+                # Women wear Neutrals
+                if random.random() < 0.6: 
+                    # Monochrome Suit Look
+                    base_color = random.choice(["black", "navy", "grey", "charcoal"])
+                    top_color = "white" if random.random() < 0.5 else base_color
+                    bottom_color = base_color
+                else:
+                    # Professional Contrast
+                    top_color = random.choice(["white", "beige", "lightblue", "cream"])
+                    bottom_color = random.choice(["black", "navy", "grey"])
+
+            # LOGIC B: SPORTS (Athletic Rules)
+            elif occasion == "sports":
+                top_color = random.choice(colors_neutral + colors_bright)
+                bottom_color = random.choice(["black", "grey", "navy"])
+
+            # LOGIC C: PARTY (Fun Rules)
+            elif occasion == "party":
+                if gender == "female":
+                    top_color = random.choice(colors_bright + ["black", "gold", "silver", "red"])
+                    bottom_color = random.choice(["black", "white", "beige"])
+                else:
+                    top_color = random.choice(["black", "white", "maroon", "navy"])
+                    bottom_color = random.choice(["black", "blue", "grey"])
+
+            # LOGIC D: CASUAL / TRAVEL / DATE (Weather Dependent)
+            else:
+                # Top Color based on Weather
+                if weather in ["summer", "spring"]:
+                    top_color = random.choice(colors_pastel + colors_neutral + colors_bright)
+                else: # Winter/Autumn/Rainy
+                    top_color = random.choice(colors_dark + colors_neutral + ["mustard", "rust"])
+
+                # Bottom Color - Standard Fashion (Jeans/Chinos/Skirts)
+                if random.random() < 0.7:
+                    # 70% of people wear Denim or Black bottoms for casual
+                    bottom_color = random.choice(colors_denim + ["black", "khaki"])
+                else:
+                    bottom_color = random.choice(colors_neutral)
+
+            # --- FINAL SANITY CHECK ---
+            # Ensure we didn't accidentally pick the exact same color for non-suits
+            # (e.g., Red Shirt + Red Pants is weird unless it's a jumpsuit/party)
+            if top_color == bottom_color and style not in ["formal", "business", "sporty"]:
+                bottom_color = "black" # Default to black if colors clashed
+
+            writer.writerow([gender, body_type, occasion, weather, style, top_color, bottom_color])
+
+    print(f"✅ Success! Generated '{filename}' with {num_rows} realistic fashion rows.")
+
+if __name__ == "__main__":
+    generate_realistic_fashion_data()
